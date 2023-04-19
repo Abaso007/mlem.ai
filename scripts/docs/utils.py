@@ -26,9 +26,7 @@ def get_section(content: str, section_name: str, section_prefix: str = "## "):
         content,
         flags=re.MULTILINE | re.DOTALL,
     )
-    if not find:
-        return None
-    return find[0]
+    return find[0] if find else None
 
 
 def get_sections(path: str, *sections, section_prefix: str = "## "):

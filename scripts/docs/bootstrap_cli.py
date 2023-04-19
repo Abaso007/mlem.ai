@@ -38,8 +38,7 @@ def repr_arg(option: Opt):
 
 def generate_options(options: List[Opt]):
     res = ["", ""]
-    for option in options:
-        res.append(repr_option(option))
+    res.extend(repr_option(option) for option in options)
     return "\n".join(res + ["", ""])
 
 
@@ -60,7 +59,7 @@ def _gen_usage_string(spec: Spec):
         line = f"{option_lines[-1]}{o} "
         if len(line) > max_opts_len and option_lines[-1] != "":
             option_lines[-1] = option_lines[-1].strip()
-            option_lines.append(o + " ")
+            option_lines.append(f"{o} ")
         else:
             option_lines[-1] = line
     option_lines[-1] = option_lines[-1].strip()
@@ -117,8 +116,7 @@ def generate_cli_command(name: str, spec: Spec):
     data = replace_section(data, "Options", generate_options(spec.options))
 
     cmd_name = name.replace("/", " ")
-    if cmd_name.endswith(" index"):
-        cmd_name = cmd_name[: -len(" index")]
+    cmd_name = cmd_name.removesuffix(" index")
     data = replace_section(
         data, cmd_name, place_links_in_doc(spec.doc), section_prefix="#"
     )

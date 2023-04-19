@@ -194,7 +194,7 @@ def repr_field(field: Field) -> Tuple[str, Type]:
 def get_impl_docstring(type_):
     doc = inspect.cleandoc(type_.__doc__ or "Class docstring missing").strip()
     return "\n".join(
-        f"{textwrap.fill('    ' + line, subsequent_indent='    ', width=LINE_WIDTH - 5)}"
+        f"{textwrap.fill(f'    {line}', subsequent_indent='    ', width=LINE_WIDTH - 5)}"
         for line in doc.splitlines()
     )
 
@@ -204,14 +204,13 @@ def get_impl_description(type_: Type[MlemABC]) -> Tuple[str, List[Type]]:
     fields = list(iterate_type_fields(type_))
     add_types = []
     if fields:
-        fields_doc = "**Fields**:\n\n"
         fds = []
         for f in fields:
             fd, add_type = repr_field(f)
             fds.append(fd)
             if add_type:
                 add_types.append(add_type)
-        fields_doc += "\n\n".join(fds)
+        fields_doc = "**Fields**:\n\n" + "\n\n".join(fds)
     doc = get_impl_docstring(type_)
     return (
         f"""## `class {type_.__name__}`
@@ -230,10 +229,8 @@ def get_impl_description(type_: Type[MlemABC]) -> Tuple[str, List[Type]]:
 
 def get_model_description(type_: Type[BaseModel]) -> str:
     fields_doc = "**No fields**"
-    fields = list(iterate_type_fields(type_))
-    if fields:
-        fields_doc = "**Fields**:\n\n"
-        fields_doc += "\n\n".join(repr_field(f)[0] for f in fields)
+    if fields := list(iterate_type_fields(type_)):
+        fields_doc = "**Fields**:\n\n" + "\n\n".join(repr_field(f)[0] for f in fields)
     doc = get_impl_docstring(type_)
     return f"""## `class {type_.__name__}`
 
@@ -250,8 +247,7 @@ def get_extension_impls_md(impls: List[Type[MlemABC]]):
         d, add = get_impl_description(e)
         descr.append(d)
         add_types.update(add)
-    for add in add_types:
-        descr.append(get_model_description(add))
+    descr.extend(get_model_description(add) for add in add_types)
     return "\n---\n\n".join(descr)
 
 

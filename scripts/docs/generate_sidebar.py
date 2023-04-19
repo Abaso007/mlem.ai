@@ -16,10 +16,14 @@ IGNORE = [
 
 
 def get_label(path):
-    for line in path.open():
-        if line.startswith("# "):
-            return line.lstrip("#").strip()
-    return ""
+    return next(
+        (
+            line.lstrip("#").strip()
+            for line in path.open()
+            if line.startswith("# ")
+        ),
+        "",
+    )
 
 
 def get_sidebar_paths(nodes, parent=""):
@@ -49,7 +53,7 @@ def adjust_sidebar(sidebar, to_add: List[str], to_remove: List[str], parent: str
                 else entry["slug"]
             )
             entry["children"] = adjust_sidebar(
-                entry["children"], to_add, to_remove, parent_path + "/"
+                entry["children"], to_add, to_remove, f"{parent_path}/"
             )
 
         res.append(entry)
@@ -57,7 +61,7 @@ def adjust_sidebar(sidebar, to_add: List[str], to_remove: List[str], parent: str
         if add_file == "index.md":
             add_root, root_name = os.path.split(add_root)
             add_file = os.path.join(root_name, add_file)
-        if add_root + "/" == parent or (parent == add_root == ""):
+        if f"{add_root}/" == parent or parent == add_root == "":
             path = Path(DOCS_PATH) / add_root / add_file
             print("adding", parent, add_root, add_file)
             slug = os.path.dirname(add_file) or add_file[: -len(".md")]

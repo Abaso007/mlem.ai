@@ -64,20 +64,19 @@ def repr_option(option, ctx) -> Opt:
 
 
 def generate_options(command: Command, ctx):
-    res = []
-    for option in get_options(command, ctx):
-        if not isinstance(option, Option):
-            continue
-        res.append(repr_option(option, ctx))
-    return res
+    return [
+        repr_option(option, ctx)
+        for option in get_options(command, ctx)
+        if isinstance(option, Option)
+    ]
 
 
 def generate_args(command, ctx):
-    args = []
-    for arg in command.get_params(ctx):
-        if isinstance(arg, Option):
-            continue
-        args.append(repr_option(arg, ctx))
+    args = [
+        repr_option(arg, ctx)
+        for arg in command.get_params(ctx)
+        if not isinstance(arg, Option)
+    ]
     impls = None
     metavar = None
     subcommands = None

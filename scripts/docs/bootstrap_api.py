@@ -17,10 +17,10 @@ def get_signature(cmd):
 
 
 def get_docs(cmd):
-    docs = cmd.__doc__
-    if not docs:
+    if docs := cmd.__doc__:
+        return docs
+    else:
         raise ValueError(f"Command {cmd} has no docstring")
-    return docs
 
 
 def generate_signature(cmd):
@@ -110,7 +110,7 @@ def generate_api():
 
     for cmd in commands:
         name = cmd.__name__
-        cmd_path = os.path.join(API_DOCS_PATH, name + ".md")
+        cmd_path = os.path.join(API_DOCS_PATH, f"{name}.md")
         if not os.path.exists(cmd_path):
             print(f"creating {name}")
         else:
